@@ -1,17 +1,23 @@
 import arcade
 from constants import *
 from PIL.Image import FLIP_LEFT_RIGHT
-
+from utils.logging_config import logger
 
 class Player(arcade.Sprite):
     def __init__(self):
         super().__init__()
+        self.logger = logger.getChild('Player')
 
         # 加载纹理
         assets_dir = get_asset_path("player")
-        self.run_frames = [arcade.load_texture(f"{assets_dir}/run_{i}.png") for i in range(1, 7)]
-        self.stand_texture = arcade.load_texture(f"{assets_dir}/stand.png")
-        self.jump_texture = arcade.load_texture(f"{assets_dir}/jump.png")
+        try:
+            self.run_frames = [arcade.load_texture(f"{assets_dir}/run_{i}.png") for i in range(1, 7)]
+            self.stand_texture = arcade.load_texture(f"{assets_dir}/stand.png")
+            self.jump_texture = arcade.load_texture(f"{assets_dir}/jump.png")
+            self.logger.debug("Player textures loaded successfully")
+        except Exception as e:
+            self.logger.error(f"Texture loading failed: {str(e)}")
+            raise
 
         # 初始化状态
         self.texture = self.stand_texture

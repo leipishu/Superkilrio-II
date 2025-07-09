@@ -2,99 +2,103 @@ import arcade
 from constants import *
 from player import Player
 from levels.level_manager import LevelManager
+from utils.logging_config import logger
 
 
 class Superkilrio(arcade.Window):
     def __init__(self):
-        """初始化游戏窗口"""
+        self.logger = logger.getChild('GameWindow')  # Child logger
+        """Initialize the game window"""
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
-        # 游戏核心元素
+        # Core game elements
         self.player = Player()
         self.level_manager = LevelManager()
         self.background = None
-        self.held_keys = set()  # 新增：追踪按下的键
+        self.held_keys = set()  # New: Track pressed keys
 
-        # 调试开关
+        # Debug switch
         self.debug_mode = True
 
-        # 字体设置
-        self.font_name = "Microsoft YaHei"  # 新增：微软雅黑字体
+        # Font settings
+        self.font_name = "Microsoft YaHei"  # New: Microsoft YaHei font
         self.setup()
 
     def setup(self):
-        """初始化游戏资源"""
-        # 加载背景
+        """Initialize game resources"""
+        # Load background
         try:
             self.background = arcade.load_texture(get_asset_path("background.png"))
             if self.debug_mode:
-                print("✅ 背景加载成功")
+                self.logger.info("Background loaded successfully")
         except Exception as e:
             if self.debug_mode:
-                print(f"⚠️ 背景加载失败: {str(e)}")
+                self.logger.error(f"Background loading failed: {str(e)}")
 
-        # 初始化关卡系统
+        # Initialize level system
         self.level_manager.load_levels()
-        self.level_manager.goto_level(0)  # 强制从第0关开始
+        self.level_manager.goto_level(0)
+        self.logger.info(f"Current level: {self.level_manager.current_level_num}")
+        self.logger.debug(f"Player initial position: ({self.player.center_x}, {self.player.center_y})")
 
     def on_draw(self):
-        """渲染游戏画面"""
+        """Render the game screen"""
         arcade.start_render()
 
-        # 1. 绘制背景
+        # 1. Draw background
         if self.background:
             arcade.draw_lrwh_rectangle_textured(
                 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
                 self.background
             )
 
-        # 2. 绘制地面系统
+        # 2. Draw ground system
         arcade.draw_line(0, GROUND_Y, SCREEN_WIDTH, GROUND_Y,
                          arcade.color.BLACK, 3)
 
-        # 3. 绘制关卡内容
+        # 3. Draw level content
         self.level_manager.draw()
 
-        # 4. 绘制玩家
+        # 4. Draw player
         self.player.draw()
 
-        # 5. 调试信息
+        # 5. Debug information
         if self.debug_mode:
             self._draw_debug_info()
 
     def _draw_debug_info(self):
-        """绘制调试信息"""
-        # 移除玩家头顶文字显示
+        """Draw debug information"""
+        # Remove player头顶 text display
 
-        # 关卡信息（使用微软雅黑字体）
+        # Level information (using Microsoft YaHei font)
         arcade.draw_text(
-            f"关卡: {self.level_manager.current_level_num}",
+            f"Level: {self.level_manager.current_level_num}",
             10, SCREEN_HEIGHT - 30,
             arcade.color.WHITE, 20,
-            font_name=self.font_name  # 使用指定字体
+            font_name=self.font_name  # Use specified font
         )
 
     def on_update(self, delta_time):
-        """游戏逻辑更新"""
-        # 更新玩家
+        """Update game logic"""
+        # Update player
         self.player.update()
         self.player.update_animation(delta_time)
 
-        # 更新关卡
+        # Update level
         self.level_manager.update(delta_time)
 
-        # 物理系统
+        # Physics system
         self._apply_physics()
 
-        # 调试输出
+        # Debug output
         if self.debug_mode and arcade.key.SPACE in self.held_keys:
-            print(f"玩家坐标: ({self.player.center_x:.1f}, {self.player.center_y:.1f})")
+            self.logger.debug(f"Player position: ({self.player.center_x:.1f}, {self.player.center_y:.1f})")
 
     def _apply_physics(self):
-        """物理效果"""
+        """Apply physics effects"""
         self.player.change_y -= GRAVITY
 
-        # 地面碰撞
+        # Ground collision
         if self.player.bottom <= GROUND_Y:
             self.player.bottom = GROUND_Y
             self.player.change_y = 0
@@ -104,8 +108,8 @@ class Superkilrio(arcade.Window):
             self.player.is_on_ground = False
 
     def on_key_press(self, key, modifiers):
-        """键盘按下"""
-        self.held_keys.add(key)  # 记录按下的键
+        """Keyboard press"""
+        self.held_keys.add(key)  # Record pressed key
 
         if key == arcade.key.LEFT:
             self.player.change_x = -PLAYER_SPEED
@@ -125,7 +129,7 @@ class Superkilrio(arcade.Window):
             self.debug_mode = not self.debug_mode
 
     def on_key_release(self, key, modifiers):
-        """键盘释放"""
+        """Keyboard release"""
         if key in self.held_keys:
             self.held_keys.remove(key)
 
@@ -134,7 +138,7 @@ class Superkilrio(arcade.Window):
 
 
 def main():
-    """游戏入口"""
+    """Game entry point"""
     window = Superkilrio()
     arcade.run()
 
