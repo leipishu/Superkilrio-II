@@ -6,10 +6,10 @@ class TrainerNPC(arcade.Sprite):
     def __init__(self):
         super().__init__()
         self.logger = logger.getChild("TrainerNPC")
-        
+
         # 调整为与player相同尺寸
         self.scale = NPC_SCALE  # 修改点1：使用统一缩放比例
-        
+
         # 加载纹理（仅站立状态）
         try:
             assets_dir = get_asset_path("npc")
@@ -20,3 +20,12 @@ class TrainerNPC(arcade.Sprite):
             # 备用方案：红色方块
             self.color = arcade.color.RED
             self.logger.warning("Using fallback texture.")
+
+    def get_dialogue(self):
+        """返回NPC的对话内容"""
+        return [
+            "你好，冒险者！",
+            "欢迎来到Superkilrio的世界。",
+            "按方向键移动，按上键跳跃。",
+            "祝你好运！"
+        ]
