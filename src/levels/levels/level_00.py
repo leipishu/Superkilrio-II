@@ -1,4 +1,3 @@
-"""Level 00 implementation"""
 from ..level_manager import Level as BaseLevel
 from src.ecs.entities.npc.trainer import TrainerNPC
 from src.constants import *

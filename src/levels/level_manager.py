@@ -27,6 +27,15 @@ class Level:
                 npc.bottom = GROUND_Y
                 npc.change_y = 0
 
+        for enemy in self.enemies:
+            enemy.change_y -= GRAVITY  # 应用重力
+            enemy.center_y += enemy.change_y  # 更新位置
+
+            # 地面检测
+            if enemy.bottom <= GROUND_Y:
+                enemy.bottom = GROUND_Y
+                enemy.change_y = 0
+
         if len(self.enemies) == 0:
             self.is_completed = True
 

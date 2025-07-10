@@ -19,6 +19,15 @@ GROUND_HEIGHT = 130
 NPC_SCALE = 0.5
 TRAINER_DIALOGUE_COOLDOWN = 2.0  # 对话冷却时间
 
+# Enemies
+ENEMY_SCALE = 0.5      # 敌人基础缩放
+LEVEL1_GRUNT = {
+    'health': 100,
+    'speed': 2.0,
+    'damage': 10,
+    'scale': 0.5
+}
+
 # 地面设置
 GROUND_Y = 130  # 地面线位置（从屏幕底部算起）
 
