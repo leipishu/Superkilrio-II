@@ -11,13 +11,13 @@ class InputHandler:
         """键盘按下事件"""
         self.game.held_keys.add(key)
 
-        if key == arcade.key.LEFT:
+        if key == arcade.key.LEFT or key == arcade.key.A:
             self.game.player.change_x = -PLAYER_SPEED
             self.game.player.facing_right = False
-        elif key == arcade.key.RIGHT:
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.game.player.change_x = PLAYER_SPEED
             self.game.player.facing_right = True
-        elif key == arcade.key.UP:
+        elif key == arcade.key.UP or key == arcade.key.W:
             if self.game.player.is_on_ground or self.game.player.remaining_jumps > 0:
                 self.game.player.change_y = PLAYER_JUMP_SPEED
                 if not self.game.player.is_on_ground:

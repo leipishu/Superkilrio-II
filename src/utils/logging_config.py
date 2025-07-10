@@ -67,7 +67,7 @@ def setup_logging():
     logging.getLogger('PIL').setLevel(logging.WARNING)
 
     # 记录本次日志文件信息
-    root_logger.info(f"初始化日志系统，日志文件: {log_file.name}")
+    root_logger.info(f"initialized logging, log file: {log_file.name}")
 
 # 自动初始化
 setup_logging()

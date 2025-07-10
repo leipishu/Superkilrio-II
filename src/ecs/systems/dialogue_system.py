@@ -2,6 +2,7 @@
 import arcade
 from typing import List, Optional
 from src.constants import SCREEN_WIDTH
+from src.utils.logging_config import logger  # 导入配置好的logger
 
 
 class DialogueSystem:
@@ -11,7 +12,7 @@ class DialogueSystem:
         self.active_dialogue: Optional[List[str]] = None
         self.current_line = 0
         self.box_height = 200  # 增加对话框高度
-        self.box_color = (240, 240, 240, 230)  # 半透明白色 (RGBA)
+        self.box_color = (240, 240, 240, 170)  # 半透明白色 (RGBA)
         self.text_color = arcade.color.BLACK
         self.border_color = arcade.color.DARK_GRAY
         self.is_visible = False
@@ -21,8 +22,11 @@ class DialogueSystem:
         self.margin = 30
         self.max_line_width = SCREEN_WIDTH - 2 * self.margin
 
+        logger.debug("DialogueSystem initialized")  # 记录初始化日志
+
     def start_dialogue(self, lines: List[str]):
         """开始对话时自动分割长文本"""
+        logger.info(f"Starting dialogue with {len(lines)} input lines")
         self.active_dialogue = []
         for line in lines:
             # 自动分割过长的单行文本
@@ -30,9 +34,14 @@ class DialogueSystem:
             self.active_dialogue.extend(wrapped_lines)
         self.current_line = 0
         self.is_visible = True
+        logger.debug(f"Dialogue started, total {len(self.active_dialogue)} wrapped lines")
 
     def _wrap_text(self, text: str) -> List[str]:
         """手动实现文本换行逻辑"""
+        if not text.strip():
+            logger.warning("Received empty text for wrapping")
+            return [""]
+
         words = text.split(' ')
         lines = []
         current_line = []
@@ -53,21 +62,27 @@ class DialogueSystem:
         if current_line:
             lines.append(' '.join(current_line))
 
+        logger.debug(f"Wrapped text '{text[:30]}...' into {len(lines)} lines")
         return lines
 
     def next_line(self) -> bool:
         """推进到下一条对话"""
         if not self.active_dialogue:
+            logger.warning("Attempted to advance empty dialogue")
             return True
 
         self.current_line += 1
         if self.current_line >= len(self.active_dialogue):
+            logger.debug("Dialogue reached end, closing")
             self.end_dialogue()
             return True
+
+        logger.debug(f"Advanced to line {self.current_line + 1}/{len(self.active_dialogue)}")
         return False
 
     def end_dialogue(self):
         """结束对话"""
+        logger.info("Ending current dialogue")
         self.active_dialogue = None
         self.is_visible = False
 
@@ -83,16 +98,6 @@ class DialogueSystem:
             width=SCREEN_WIDTH,
             height=self.box_height,
             color=self.box_color
-        )
-
-        # 绘制边框
-        arcade.draw_rectangle_outline(
-            center_x=SCREEN_WIDTH // 2,
-            center_y=self.box_height // 2,
-            width=SCREEN_WIDTH - 10,
-            height=self.box_height - 10,
-            color=self.border_color,
-            border_width=2
         )
 
         # 绘制当前对话文本（手动实现多行绘制）
@@ -119,7 +124,7 @@ class DialogueSystem:
             text=page_indicator,
             start_x=SCREEN_WIDTH - self.margin - 50,
             start_y=20,
-            color=arcade.color.DARK_GRAY,
+            color=arcade.color.EERIE_BLACK,
             font_size=14,
             font_name=self.font_name
         )
@@ -129,7 +134,7 @@ class DialogueSystem:
             text="按E键继续...",
             start_x=self.margin,
             start_y=20,
-            color=arcade.color.DARK_GRAY,
+            color=arcade.color.EERIE_BLACK,
             font_size=14,
             font_name=self.font_name
         )

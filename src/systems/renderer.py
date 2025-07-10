@@ -39,7 +39,8 @@ class Renderer:
                     self.game.interaction_system.near_npc.center_x,
                     self.game.interaction_system.near_npc.top + 20,
                     arcade.color.WHITE,
-                    16,
+                    font_size=16,
+                    font_name="Microsoft YaHei",
                     anchor_x="center"
                 )
 
