@@ -25,6 +25,10 @@ LEVEL1_GRUNT = {
     'health': 100,
     'speed': 2.0,
     'damage': 10,
+    'ai_type': 'chase',  # AI类型
+    'detection_range': 300,
+    'jump_ratio': 0.7,
+    'animation_speed': 0.1,
     'scale': 0.5
 }
 
