@@ -13,10 +13,11 @@ class Level:
         self.enemies = arcade.SpriteList()
         self.npcs = arcade.SpriteList()
         self.is_completed = False
+        self.player = None  # Store player reference
 
-    def setup(self):
+    def setup(self, player=None):
         """Initialize level content"""
-        pass
+        self.player = player  # Store player reference for AI updates
 
     def update(self, delta_time: float):
         """Update level logic"""
@@ -29,7 +30,8 @@ class Level:
 
         for enemy in self.enemies:
             enemy.change_y -= GRAVITY  # 应用重力
-            enemy.center_y += enemy.change_y  # 更新位置
+            enemy.center_y += enemy.change_y  # 更新垂直位置
+            enemy.center_x += enemy.change_x  # 更新水平位置 - 这是关键！
 
             # 地面检测
             if enemy.bottom <= GROUND_Y:
@@ -90,7 +92,7 @@ class LevelManager:
             except Exception as e:
                 self.logger.error(f"Failed to load module: {module_name} - {str(e)}")
 
-    def goto_level(self, level_num: int):
+    def goto_level(self, level_num: int, player=None):
         """Go to specified level"""
         self.logger.info(f"Attempting to load level {level_num}")
         if level_num not in self.levels:
@@ -109,7 +111,16 @@ class LevelManager:
         self.logger.debug(f"Base class initialization status: {'Level' in [base.__name__ for base in level_class.__bases__]}")
 
         self.logger.debug("Calling level setup() method")
-        self.current_level.setup()
+        # Pass player reference to setup method if it accepts it
+        if hasattr(self.current_level.setup, '__code__'):
+            import inspect
+            sig = inspect.signature(self.current_level.setup)
+            if 'player' in sig.parameters:
+                self.current_level.setup(player=player)
+            else:
+                self.current_level.setup()
+        else:
+            self.current_level.setup()
 
         # In-depth debugging NPC list
         if hasattr(self.current_level, 'npcs'):
@@ -124,9 +135,9 @@ class LevelManager:
         self.current_level_num = level_num
         self.logger.info(f"Level loaded successfully: {level_num}")
 
-    def next_level(self):
+    def next_level(self, player=None):
         """Go to next level"""
-        self.goto_level(self.current_level_num + 1)
+        self.goto_level(self.current_level_num + 1, player=player)
 
     def update(self, delta_time: float):
         """Update current level"""

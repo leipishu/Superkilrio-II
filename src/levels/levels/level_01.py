@@ -1,3 +1,4 @@
+# src/levels/levels/level_01.py
 from ..level_manager import Level as BaseLevel
 from src.ecs.entities.enemies.level1_grunt import Level1Grunt
 from src.constants import *
@@ -13,65 +14,49 @@ class Level(BaseLevel):  # 类名必须为Level，不是Level01
     def __init__(self):
         super().__init__()
         self.logger = logger.getChild(f"Level{LEVEL_NUM}")
-        self.logger.info("初始化Level1")
+        self.logger.info("Setting up level")
         self.change_y = 0  # 初始垂直速度
         self.change_x = 0  # 初始水平速度
+        self.player = None  # 新增：存储玩家引用
 
-    def setup(self):
-        self.logger.info("设置Level1关卡")
+    def setup(self, player=None):  # 修改：添加player参数
+        """设置关卡内容"""
+        super().setup(player)  # Call parent setup to store player reference
+        self.logger.info("Setting up Level1")
 
-        # 生成3个随机位置的敌人
+        # 生成3个随机位置的敌人 - 更靠近玩家起始位置
+        player_start_x = 100  # 玩家起始位置
         for i in range(3):
             grunt = Level1Grunt()
-            x = random.randint(200, SCREEN_WIDTH - 200)
+            # 在玩家附近生成敌人，确保在检测范围内
+            x = random.randint(player_start_x - 200, player_start_x + 200)
             y = GROUND_Y + grunt.height / 2
 
             # 防重叠
-            while any(abs(x - e.center_x) < 150 for e in self.enemies):
-                x = random.randint(200, SCREEN_WIDTH - 200)
+            while any(abs(x - e.center_x) < 80 for e in self.enemies):
+                x = random.randint(player_start_x - 200, player_start_x + 200)
 
             grunt.center_x = x
             grunt.center_y = y
-            grunt.change_x = random.choice([-1, 1]) * grunt.speed
+            grunt.change_x = 0  # 初始不移动，让AI控制
             self.enemies.append(grunt)
 
         self.is_completed = False
-        self.logger.info("Level1设置完成")
-
-    def spawn_grunts(self, count: int):
-        """生成指定数量的一级步兵"""
-        for i in range(count):
-            try:
-                grunt = Level1Grunt()
-
-                # 随机位置（确保在地面上且不重叠）
-                x = random.randint(200, SCREEN_WIDTH - 200)
-                y = GROUND_Y + grunt.height / 2
-
-                # 确保不与现有敌人重叠
-                while any(abs(x - e.center_x) < 100 for e in self.enemies):
-                    x = random.randint(200, SCREEN_WIDTH - 200)
-
-                grunt.center_x = x
-                grunt.center_y = y
-
-                # 随机初始移动方向
-                grunt.change_x = random.choice([-1, 1]) * grunt.speed
-
-                self.enemies.append(grunt)
-                self.logger.debug(f"生成一级步兵 {i + 1} 在 ({x}, {y})")
-
-            except Exception as e:
-                self.logger.error(f"生成一级步兵失败: {str(e)}")
+        self.logger.info("Level1 Initialized")
 
     def update(self, delta_time: float):
         """更新关卡逻辑"""
-        super().update(delta_time)  # 调用父类物理更新
+        super().update(delta_time)
 
-        # 检查关卡完成条件
+        # 确保所有敌人都被更新
+        for enemy in self.enemies:
+            enemy.update()  # 更新基础移动
+            enemy.update_animation(delta_time)  # 更新动画
+            if hasattr(enemy, 'update_ai') and self.player:
+                enemy.update_ai(self.player, delta_time)
+
         if len(self.enemies) == 0:
             self.is_completed = True
-            self.logger.info("所有敌人都被击败，关卡完成")
 
     def draw(self):
         """绘制关卡"""

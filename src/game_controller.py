@@ -24,6 +24,7 @@ class GameController:
         self.interaction_system = InteractionSystem(self)
         self.input_handler = InputHandler(self)
         self.renderer = Renderer(self)
+        self.level_manager.game = self  # 新增：建立反向引用
 
         # 其他属性
         self.background = None
@@ -46,7 +47,7 @@ class GameController:
             self.logger.error(f"Background loading failed: {str(e)}")
 
         self.level_manager.load_levels()
-        self.level_manager.goto_level(0)
+        self.level_manager.goto_level(0, player=self.player)
 
     def on_draw(self):
         """渲染回调"""

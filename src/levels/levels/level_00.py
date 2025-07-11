@@ -15,7 +15,8 @@ class Level(BaseLevel):
         self.logger.debug(f"Parent class: {super().__class__.__name__}")
         self.logger.debug(f"Initial npcs list: {len(self.npcs)} items")
 
-    def setup(self):
+    def setup(self, player=None):
+        super().setup(player)  # Call parent setup to store player reference
         self.logger.info("Starting level setup")
         try:
             # 创建教官NPC
@@ -32,7 +33,6 @@ class Level(BaseLevel):
             self.logger.debug("NPC added successfully")
 
             # 本关可直接通过
-            self.is_completed = True
             self.logger.info("Level setup completed")
 
         except Exception as e:
