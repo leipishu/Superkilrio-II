@@ -1,0 +1,11 @@
+# Handle line endings
+* text=auto
+
+# Python files
+*.py text diff=python
+
+# Images (do not diff)
+*.png binary
+
+# Exclude logs from diff
+src/logs/* linguist-vendored 

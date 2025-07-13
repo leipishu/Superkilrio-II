@@ -1,0 +1,17 @@
+[core]
+	editor = nano
+	excludesfile = ~/.gitignore_global
+[merge]
+	tool = vimdiff
+[diff]
+	tool = vimdiff
+[push]
+	default = simple
+[init]
+	defaultBranch = master
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	cm = commit
+	lg = log --oneline --graph --all 
