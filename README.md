@@ -1,5 +1,11 @@
 # Superkilrio II ———— 时光碎片
 
+中文  |
+[English](docs/README.en.md)   |
+[日本語](docs/README.ja.md)  |
+[Español](docs/README.es.md)  |
+[Français](docs/README.fr.md)  |
+
 ## 简介
 Python 2D横版小游戏，为一代重做/续作版本，拥有更流畅的动画，更高的性能，更好的贴图以及更好的玩法。目前处于开发初期
 
