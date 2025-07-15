@@ -1,4 +1,8 @@
-# Contributing to Superkilrio II
+# 贡献指南 / Contributing Guide
+
+**详细开发文档请参见 [docs/DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md)（中英文）以快速了解项目结构与开发接口。**
+
+**For a detailed developer guide (bilingual), see [docs/DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md) for project structure and development interfaces.**
 
 Thank you for considering contributing to Superkilrio II!
 
