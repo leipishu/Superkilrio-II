@@ -35,6 +35,8 @@ class Level1Grunt(arcade.Sprite):
         self.jump_ratio = 0.7  # 新增跳跃比例
         self.is_on_ground = False  # 新增地面检测
 
+        self.name = "一级步兵"
+
         # 加载纹理
         self.load_textures()
 

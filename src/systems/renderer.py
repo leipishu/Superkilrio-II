@@ -29,6 +29,9 @@ class Renderer:
         # 绘制对话系统
         self.game.dialogue_system.draw()
 
+        # 绘制粒子
+        self.game.combat_system.particle_system.draw()
+
         # 调试信息
         if self.game.debug_mode:
             self._draw_debug_info()

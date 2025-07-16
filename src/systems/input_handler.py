@@ -22,6 +22,8 @@ class InputHandler:
                 self.game.player.change_y = PLAYER_JUMP_SPEED
                 if not self.game.player.is_on_ground:
                     self.game.player.remaining_jumps -= 1
+        elif key == arcade.key.Z:  # 新增攻击键
+            self.game.player.try_attack()
         elif key == arcade.key.SPACE:
             if self.game.level_manager.current_level.is_completed:
                 self.game.level_manager.next_level(player=self.game.player)

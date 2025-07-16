@@ -9,6 +9,7 @@ from src.systems.physics_system import PhysicsSystem
 from src.systems.interaction_system import InteractionSystem
 from src.systems.input_handler import InputHandler
 from src.systems.renderer import Renderer
+from src.systems.combat_system import CombatSystem  # 新增导入
 
 
 class GameController(arcade.View):
@@ -24,7 +25,8 @@ class GameController(arcade.View):
         self.interaction_system = InteractionSystem(self)
         self.input_handler = InputHandler(self)
         self.renderer = Renderer(self)
-        self.level_manager.game = self  # 新增：建立反向引用
+        self.combat_system = CombatSystem(self)  # 新增战斗系统
+        self.level_manager.game = self  # 建立反向引用
 
         # 其他属性
         self.background = None
@@ -52,6 +54,9 @@ class GameController(arcade.View):
         self.level_manager.update(delta_time)
         self.interaction_system.check_npc_proximity()
         self.physics_system.apply_physics(self.player)
+        self.combat_system.update(delta_time)
+        self.combat_system.update(delta_time)
+
         if self.debug_mode and arcade.key.SPACE in self.held_keys:
             self.logger.debug(f"Player position: ({self.player.center_x:.1f}, {self.player.center_y:.1f})")
 
