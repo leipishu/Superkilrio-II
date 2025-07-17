@@ -2,13 +2,16 @@ import arcade
 from constants import *
 from PIL.Image import FLIP_LEFT_RIGHT
 from utils.logging_config import logger
+from src.systems.particle_system import ParticleSystem
 import time
 
 
 class Player(arcade.Sprite):
-    def __init__(self):
+    def __init__(self, game=None):
         super().__init__()
         self.logger = logger.getChild('Player')
+        self.particle_system = ParticleSystem()
+
 
         # 加载纹理
         assets_dir = get_asset_path("player")
@@ -49,6 +52,11 @@ class Player(arcade.Sprite):
         self.attack_timer = 0
         self.last_attack_time = 0
         self.has_dealt_damage = False  # 新增：标记是否已造成伤害
+
+        # 生命值
+        self.max_health = PLAYER_MAX_HEALTH
+        self.health = PLAYER_MAX_HEALTH
+        self.is_dead = False
 
     def update_animation(self, delta_time):
         """更新动画状态"""
@@ -107,6 +115,17 @@ class Player(arcade.Sprite):
             self.has_dealt_damage = False  # 重置伤害标记
             return True
         return False
+
+    def take_damage(self, amount):
+        """玩家受伤"""
+        if self.is_dead:
+            return
+        self.health -= amount
+        self.particle_system.create_hurt_effect(self.center_x, self.center_y)
+        if self.health <= 0:
+            self.health = 0
+            self.is_dead = True
+            self.logger.info('Player died!')
 
     def get_attack_hitbox(self):
         """获取攻击判定框"""

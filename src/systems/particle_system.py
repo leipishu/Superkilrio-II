@@ -81,6 +81,10 @@ class ParticleSystem:
             self.kill_sprite.center_y = y + 40  # 敌人头顶
             self.kill_timer = 0.5 # 显示0.5秒
 
+    def create_hurt_effect(self, x, y):
+        if not self._cleaned_up:
+            audio_manager.play_sound('hurt', volume=0.2)
+
     def update(self, delta_time):
         """更新单个粒子"""
         if self.particle:

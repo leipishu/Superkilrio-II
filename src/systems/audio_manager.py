@@ -33,20 +33,30 @@ class AudioManager:
             else:
                 logger.warning(f"Hit sound file not found: {hit_sound_path}")
                 self.sounds['hit'] = None
+            # 加载hurt音效
+            hurt_sound_path = get_asset_path("snd/hurt.mp3")
+            if os.path.exists(hurt_sound_path):
+                self.sounds['hurt'] = arcade.load_sound(hurt_sound_path)
+                logger.debug("Hurt sound loaded successfully")
+            else:
+                logger.warning(f"Hurt sound file not found: {hurt_sound_path}")
+                self.sounds['hurt'] = None
         except Exception as e:
             logger.error(f"Failed to load sounds: {e}")
             self.sounds['hit'] = None
+            self.sounds['hurt'] = None
 
     def play_sound(self, sound_name, volume=0.2):
-        """播放音频"""
+        """播放音频，返回player对象以支持多音效重叠播放"""
         if self._cleaned_up:
-            return
+            return None
         sound = self.sounds.get(sound_name)
         if sound:
             try:
-                arcade.play_sound(sound, volume=volume)
+                return arcade.play_sound(sound, volume=volume)
             except Exception as e:
                 logger.warning(f"Failed to play sound {sound_name}: {e}")
+        return None
 
     def cleanup(self):
         """清理所有音频资源"""

@@ -35,6 +35,15 @@ class Level1Grunt(arcade.Sprite):
         self.jump_ratio = 0.7  # 新增跳跃比例
         self.is_on_ground = False  # 新增地面检测
 
+        # 攻击相关
+        self.attack_textures = []
+        self.is_attacking = False
+        self.attack_timer = 0
+        self.attack_cooldown = 1.0  # 步兵攻击冷却（秒）
+        self.last_attack_time = 0
+        self.attack_frame = 0
+        self.has_dealt_damage = False
+
         self.name = "一级步兵"
 
         # 加载纹理
@@ -64,7 +73,12 @@ class Level1Grunt(arcade.Sprite):
                 for i in range(1, 7)  # 假设6帧动画
             ]
 
-            self.logger.debug(f"加载了{len(self.run_frames)}帧跑步动画和站立纹理")
+            # 加载攻击动画帧
+            self.attack_textures = [
+                arcade.load_texture(os.path.join(assets_dir, "attack_1.png")),
+                arcade.load_texture(os.path.join(assets_dir, "attack_2.png"))
+            ]
+            self.logger.debug(f"加载了{len(self.run_frames)}帧跑步动画和站立纹理和{len(self.attack_textures)}帧攻击动画")
 
         except Exception as e:
             self.logger.error(f"纹理加载失败: {str(e)}")
@@ -80,12 +94,31 @@ class Level1Grunt(arcade.Sprite):
         self.logger.warning("使用备用纹理")
 
     def update_animation(self, delta_time: float):
-        """更新动画状态 - 使用与玩家相同的动画逻辑"""
+        """更新动画状态 - 增加攻击动画"""
         if not self.stand_texture or not self.run_frames:
             return
 
         # 检测是否在地面上
         self.is_on_ground = (self.bottom <= GROUND_Y and self.change_y == 0)
+
+        # 攻击动画优先
+        if self.is_attacking and self.attack_textures:
+            self.attack_timer += delta_time
+            frame_duration = 0.12
+            if self.attack_timer < frame_duration:
+                self.attack_frame = 0
+            elif self.attack_timer < frame_duration * 2:
+                self.attack_frame = 1
+            else:
+                self.is_attacking = False
+                self.attack_timer = 0
+                self.attack_frame = 0
+                self.has_dealt_damage = False
+            self.texture = self.attack_textures[self.attack_frame]
+            if not self.facing_right:
+                flipped = self.texture.image.transpose(FLIP_LEFT_RIGHT)
+                self.texture = arcade.Texture(f"{self.texture.name}_flipped", flipped)
+            return
 
         # 动画逻辑 - 与玩家相同
         if self.change_y > 0:
@@ -130,6 +163,28 @@ class Level1Grunt(arcade.Sprite):
             self.right = SCREEN_WIDTH
             self.change_x = -abs(self.change_x)  # 反弹
 
+    def try_attack(self, player):
+        """尝试攻击玩家"""
+        import time
+        current_time = time.time()
+        dx = abs(self.center_x - player.center_x)
+        dy = abs(self.center_y - player.center_y)
+        if dx < 60 and dy < 60 and current_time - self.last_attack_time >= self.attack_cooldown:
+            self.is_attacking = True
+            self.attack_timer = 0
+            self.last_attack_time = current_time
+            self.has_dealt_damage = False
+            return True
+        return False
+    def attack_player_if_possible(self, player):
+        """如果可以则攻击玩家并造成伤害"""
+        import time
+        if self.is_attacking and self.attack_frame == 1 and not self.has_dealt_damage:
+            dx = abs(self.center_x - player.center_x)
+            dy = abs(self.center_y - player.center_y)
+            if dx < 60 and dy < 60:
+                player.take_damage(LEVEL1_GRUNT_ATTACK_DAMAGE)
+                self.has_dealt_damage = True
     def update_ai(self, player, delta_time: float):
         """更新AI行为"""
         self.ai_system.update_entity(
@@ -137,3 +192,6 @@ class Level1Grunt(arcade.Sprite):
             player=player,
             delta_time=delta_time
         )
+        # 攻击判定
+        self.try_attack(player)
+        self.attack_player_if_possible(player)
