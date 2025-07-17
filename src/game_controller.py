@@ -10,6 +10,7 @@ from src.systems.interaction_system import InteractionSystem
 from src.systems.input_handler import InputHandler
 from src.systems.renderer import Renderer
 from src.systems.combat_system import CombatSystem  # 新增导入
+from src.systems.audio_manager import audio_manager  # 新增导入
 
 
 class GameController(arcade.View):
@@ -65,6 +66,37 @@ class GameController(arcade.View):
 
     def on_key_release(self, key, modifiers):
         self.input_handler.on_key_release(key, modifiers)
+
+    def cleanup(self):
+        """彻底清理游戏资源，防止XAudio2误"""
+        try:
+            #1. 清理战斗系统的粒子系统（包含音频资源）
+            if hasattr(self.combat_system, 'particle_system'):
+                self.combat_system.particle_system.cleanup()
+                logger.info("Combat system audio resources cleaned up")
+            
+            # 2. 清理全局音频管理器
+            audio_manager.cleanup()
+            logger.info("Global audio manager cleaned up")
+            
+            # 3. 强制垃圾回收
+            import gc
+            try:
+                gc.collect()
+                logger.debug("Game controller forced garbage collection completed")
+            except Exception as gc_error:
+                logger.warning(f"Game controller garbage collection failed: {gc_error}")
+            
+            logger.info("Game resources cleaned up successfully")
+        except Exception as e:
+            logger.error(f"Error during game cleanup: {e}")
+
+    def __del__(self):
+        """确保资源被清理 - 备用方案"""
+        try:
+            self.cleanup()
+        except:
+            pass  # 在析构函数中忽略所有错误
 
     def run(self):
         self.setup()

@@ -1,8 +1,10 @@
 # src/systems/particle_system.py
 import arcade
 import random
+import gc
 from src.constants import *
 from src.utils.logging_config import logger
+from src.systems.audio_manager import audio_manager
 import os
 
 
@@ -37,7 +39,7 @@ class SingleHitParticle:
 
 
 class ParticleSystem:
-    """单粒子系统管理器"""
+    """单粒子系统管理器 - 使用全局音频管理器"""
 
     def __init__(self):
         self.particle = None
@@ -45,9 +47,8 @@ class ParticleSystem:
         self.kill_texture = None
         self.kill_sprite = None
         self.kill_timer = 0
-        self.hit_sound = None
+        self._cleaned_up = False  # 防止重复清理
         self.load_texture()
-        self.load_sound()
 
     def load_texture(self):
         """加载击中效果纹理"""
@@ -68,25 +69,17 @@ class ParticleSystem:
                 "kill", (32, 32), arcade.color.RED
             )
 
-    def load_sound(self):
-        try:
-            snd_path = get_asset_path("snd/hit.mp3")
-            self.hit_sound = arcade.load_sound(snd_path)
-        except Exception as e:
-            logger.warning(f"Failed to load hit sound: {e}")
-            self.hit_sound = None
-
     def create_hit_effect(self, x, y, is_kill=False):
         """创建单个击中效果"""
         self.particle = SingleHitParticle(x, y, self.hit_texture)
-        # 播放打击音效，音量较低
-        if self.hit_sound:
-            arcade.play_sound(self.hit_sound, volume=0.2)
+        # 使用全局音频管理器播放音效
+        if not self._cleaned_up:
+            audio_manager.play_sound('hit', volume=0.2)
         if is_kill:
             self.kill_sprite = arcade.Sprite(texture=self.kill_texture, scale=0.4)
             self.kill_sprite.center_x = x
             self.kill_sprite.center_y = y + 40  # 敌人头顶
-            self.kill_timer = 0.5  # 显示0.5秒
+            self.kill_timer = 0.5 # 显示0.5秒
 
     def update(self, delta_time):
         """更新单个粒子"""
@@ -104,3 +97,29 @@ class ParticleSystem:
             self.particle.sprite.draw()
         if self.kill_sprite:
             self.kill_sprite.draw()
+
+    def cleanup(self):
+        """清理粒子系统资源"""
+        if self._cleaned_up:
+            return  # 防止重复清理
+            
+        try:
+            # 清理粒子资源
+            self.particle = None
+            self.kill_sprite = None
+            
+            # 标记已清理
+            self._cleaned_up = True
+            logger.info("Particle system resources cleaned up successfully")
+            
+        except Exception as e:
+            logger.error(f"Error during particle system cleanup: {e}")
+            self._cleaned_up = True
+
+    def __del__(self):
+        """确保资源被清理 - 备用方案"""
+        if not self._cleaned_up:
+            try:
+                self.cleanup()
+            except:
+                pass  # 在析构函数中忽略所有错误
