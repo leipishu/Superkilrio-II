@@ -6,15 +6,39 @@ from src.constants import *
 from src.utils.logging_config import logger
 from src.ecs.systems.ai_system import AISystem  # 新增导入
 import random
+import json
 
 
 class Level1Grunt(arcade.Sprite):
     """一级步兵实体（包含站立和跑步动画）"""
+    _json_cache = None
+
+    @staticmethod
+    def preload_json():
+        if Level1Grunt._json_cache is None:
+            config_path = os.path.join(os.path.dirname(__file__), "level1_grunt.json")
+            with open(config_path, "r", encoding="utf-8") as f:
+                Level1Grunt._json_cache = json.load(f)
 
     def __init__(self):
         super().__init__()
         self.logger = logger.getChild("Level1Grunt")
-        self.scale = ENEMY_SCALE  # 从constants.py导入
+        # 优先使用缓存
+        if Level1Grunt._json_cache is None:
+            Level1Grunt.preload_json()
+        config = Level1Grunt._json_cache
+        self.scale = config.get("scale", 0.5)
+        self.health = config.get("health", 100)
+        self.speed = config.get("speed", 2.0)
+        self.enemy_level = 1
+        self.facing_right = False
+        self.detection_range = config.get("detection_range", 300)
+        self.jump_ratio = config.get("jump_ratio", 0.7)
+        self.is_on_ground = False
+        self.ai_type = config.get("ai_type", "chase")
+        self.animation_speed = config.get("animation_speed", 0.1)
+        self.attack_cooldown = config.get("attack_cooldown", 1.0)
+        self.attack_damage = config.get("attack_damage", 5)
 
         # 动画控制 - 与玩家相同的设置
         self.run_frames = []
@@ -23,23 +47,13 @@ class Level1Grunt(arcade.Sprite):
         self.time_since_last_frame = random.uniform(0, 5)  # 随机初始计时器
         self.is_running = False
 
-        # 物理属性
-        self.health = 100
-        self.speed = 3.0  # 增加速度让敌人移动更明显
-        self.enemy_level = 1
-        self.facing_right = False
-
         # AI相关属性
         self.ai_system = AISystem()  # 新增AI系统实例
-        self.detection_range = 500  # 增加检测范围
-        self.jump_ratio = 0.7  # 新增跳跃比例
-        self.is_on_ground = False  # 新增地面检测
 
         # 攻击相关
         self.attack_textures = []
         self.is_attacking = False
         self.attack_timer = 0
-        self.attack_cooldown = 1.0  # 步兵攻击冷却（秒）
         self.last_attack_time = 0
         self.attack_frame = 0
         self.has_dealt_damage = False
@@ -183,7 +197,7 @@ class Level1Grunt(arcade.Sprite):
             dx = abs(self.center_x - player.center_x)
             dy = abs(self.center_y - player.center_y)
             if dx < 60 and dy < 60:
-                player.take_damage(LEVEL1_GRUNT_ATTACK_DAMAGE)
+                player.take_damage(self.attack_damage)
                 self.has_dealt_damage = True
     def update_ai(self, player, delta_time: float):
         """更新AI行为"""

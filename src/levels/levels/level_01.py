@@ -18,6 +18,8 @@ class Level(BaseLevel):  # 类名必须为Level，不是Level01
         self.change_y = 0  # 初始垂直速度
         self.change_x = 0  # 初始水平速度
         self.player = None  # 新增：存储玩家引用
+        # 关卡准备阶段：预加载一级步兵json
+        Level1Grunt.preload_json()
 
     def setup(self, player=None):  # 修改：添加player参数
         """设置关卡内容"""

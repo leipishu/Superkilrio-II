@@ -43,6 +43,10 @@ class GameController(arcade.View):
         except Exception as e:
             self.logger.error(f"Background loading failed: {str(e)}")
 
+        # 主动热身音效，避免首次播放卡顿
+        audio_manager.play_sound('hit', volume=0.0)
+        audio_manager.play_sound('hurt', volume=0.0)
+
         self.level_manager.load_levels()
         self.level_manager.goto_level(0, player=self.player)
 

@@ -15,7 +15,6 @@ PLAYER_JUMP_SPEED = 15.0
 MAX_EXTRA_JUMPS = 1  # 二段跳设置
 GROUND_HEIGHT = 130
 PLAYER_MAX_HEALTH = 200  # 玩家最大生命值
-LEVEL1_GRUNT_ATTACK_DAMAGE = 5  # 一级步兵攻击伤害
 
 # 攻击系统
 ATTACK_COOLDOWN = 0.3  # 攻击冷却时间(秒)
@@ -29,16 +28,6 @@ TRAINER_DIALOGUE_COOLDOWN = 2.0  # 对话冷却时间
 
 # Enemies
 ENEMY_SCALE = 0.5      # 敌人基础缩放
-LEVEL1_GRUNT = {
-    'health': 100,
-    'speed': 2.0,
-    'damage': 10,
-    'ai_type': 'chase',  # AI类型
-    'detection_range': 300,
-    'jump_ratio': 0.7,
-    'animation_speed': 0.1,
-    'scale': 0.5
-}
 
 # 地面设置
 GROUND_Y = 130  # 地面线位置（从屏幕底部算起）
