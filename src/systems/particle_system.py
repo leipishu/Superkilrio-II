@@ -83,7 +83,7 @@ class ParticleSystem:
 
     def create_hurt_effect(self, x, y):
         if not self._cleaned_up:
-            audio_manager.play_sound('hurt', volume=0.2)
+            audio_manager.play_sound('hurt', volume=1.0)
 
     def update(self, delta_time):
         """更新单个粒子"""
