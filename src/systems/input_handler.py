@@ -40,5 +40,5 @@ class InputHandler:
         """键盘释放事件"""
         if key in self.game.held_keys:
             self.game.held_keys.remove(key)
-        if key in (arcade.key.LEFT, arcade.key.RIGHT):
+        if key in (arcade.key.LEFT, arcade.key.RIGHT, arcade.key.A, arcade.key.D):
             self.game.player.change_x = 0
