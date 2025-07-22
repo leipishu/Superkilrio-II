@@ -14,6 +14,7 @@ class Level:
         self.npcs = arcade.SpriteList()
         self.is_completed = False
         self.player = None  # Store player reference
+        self.items = arcade.SpriteList()
 
     def setup(self, player=None):
         """Initialize level content"""
@@ -41,10 +42,13 @@ class Level:
         if len(self.enemies) == 0:
             self.is_completed = True
 
+        self.items.update()
+
     def draw(self):
         """Draw level content"""
         self.enemies.draw()
         self.npcs.draw()
+        self.items.draw()
 
 
 class LevelManager:

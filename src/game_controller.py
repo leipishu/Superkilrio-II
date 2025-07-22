@@ -11,6 +11,7 @@ from src.systems.input_handler import InputHandler
 from src.systems.renderer import Renderer
 from src.systems.combat_system import CombatSystem  # 新增导入
 from src.systems.audio_manager import audio_manager  # 新增导入
+from src.items import init_item_system
 
 
 class GameController(arcade.View):
@@ -28,6 +29,7 @@ class GameController(arcade.View):
         self.renderer = Renderer(self)
         self.combat_system = CombatSystem(self)  # 新增战斗系统
         self.level_manager.game = self  # 建立反向引用
+        init_item_system()  # 初始化物品系统
 
         # 其他属性
         self.background = None

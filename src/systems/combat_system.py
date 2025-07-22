@@ -63,9 +63,35 @@ class CombatSystem:
         return False
 
     def destroy_enemy(self, enemy):
-        """销毁敌人并添加击杀提示"""
+        """安全地销毁敌人并处理掉落"""
+        # 1. 击杀特效
         self.particle_system.create_hit_effect(enemy.center_x, enemy.center_y, is_kill=True)
+
+        # 2. 检查敌人是否有destroy方法
+        logger.info(f"开始销毁敌人: {enemy}")
+        if hasattr(enemy, 'destroy') and callable(enemy.destroy):
+            logger.info("敌人有destroy方法")
+            dropped_item = enemy.destroy()
+            if dropped_item:
+                logger.info(f"成功创建掉落物: {dropped_item}")
+                # 确保关卡有items列表
+                if not hasattr(self.game.level_manager.current_level, 'items'):
+                    logger.info("创建新的items列表")
+                    self.game.level_manager.current_level.items = arcade.SpriteList()
+                # 添加掉落物
+                self.game.level_manager.current_level.items.append(dropped_item)
+                logger.info(f"掉落物已添加到场景, 当前items数量: {len(self.game.level_manager.current_level.items)}")
+                logger.info(f"掉落物位置: ({dropped_item.center_x}, {dropped_item.center_y})")
+                logger.info(f"掉落物纹理: {dropped_item.texture}")
+                # audio_manager.play_sound("item_drop")
+            else:
+                logger.warning("敌人destroy方法返回None")
+        else:
+            logger.warning(f"敌人没有destroy方法: {type(enemy)}")
+
+        # 3. 销毁敌人
         enemy.kill()
+        logger.info("敌人销毁完成")
 
     def get_entity_name(self, entity):
         """智能获取实体名称"""

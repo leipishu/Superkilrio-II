@@ -21,6 +21,22 @@ class InteractionSystem:
                     self.near_npc = npc
                     break
 
+    def check_item_pickup(self):
+        if not hasattr(self.game.player, 'center_x'):
+            return
+
+        for item in self.game.level_manager.current_level.items:
+            # 精确碰撞检测
+            if arcade.check_for_collision(self.game.player, item):
+                if hasattr(item, 'item_data'):
+                    if item.item_data.use(self.game.player):
+                        item.remove_from_sprite_lists()
+                        # 添加拾取特效
+                        self.game.particle_system.create_effect(
+                            item.center_x, item.center_y,
+                            color=arcade.color.GOLD
+                        )
+
     def handle_interaction(self, key):
         """处理交互按键"""
         if key == arcade.key.E and self.near_npc:
