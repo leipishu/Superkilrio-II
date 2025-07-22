@@ -75,7 +75,7 @@ class Level1Grunt(arcade.Sprite):
     def load_textures(self):
         """加载所有需要的纹理"""
         try:
-            assets_dir = get_asset_path("enemies/level1_grunt")
+            assets_dir = get_asset_path("enemies/public")
 
             # 加载站立纹理
             stand_path = os.path.join(assets_dir, "stand.png")
@@ -87,10 +87,12 @@ class Level1Grunt(arcade.Sprite):
                 for i in range(1, 7)  # 假设6帧动画
             ]
 
+            level1_grunt_path = get_asset_path("enemies/level1_grunt")
+
             # 加载攻击动画帧
             self.attack_textures = [
-                arcade.load_texture(os.path.join(assets_dir, "attack_1.png")),
-                arcade.load_texture(os.path.join(assets_dir, "attack_2.png"))
+                arcade.load_texture(os.path.join(level1_grunt_path, "attack_1.png")),
+                arcade.load_texture(os.path.join(level1_grunt_path, "attack_2.png"))
             ]
             self.logger.debug(f"加载了{len(self.run_frames)}帧跑步动画和站立纹理和{len(self.attack_textures)}帧攻击动画")
 
