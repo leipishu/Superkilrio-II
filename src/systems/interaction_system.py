@@ -2,6 +2,7 @@
 import math
 import arcade
 from src.constants import *
+from src.items.dropped_item import DroppedItem
 
 class InteractionSystem:
     def __init__(self, game_controller):
@@ -22,20 +23,22 @@ class InteractionSystem:
                     break
 
     def check_item_pickup(self):
-        if not hasattr(self.game.player, 'center_x'):
+        """检查并拾取地上的掉落物到当前选中格子"""
+        if not hasattr(self.game.player, 'center_x') or not hasattr(self.game.level_manager.current_level, 'items'):
             return
 
-        for item in self.game.level_manager.current_level.items:
-            # 精确碰撞检测
-            if arcade.check_for_collision(self.game.player, item):
-                if hasattr(item, 'item_data'):
-                    if item.item_data.use(self.game.player):
-                        item.remove_from_sprite_lists()
-                        # 添加拾取特效
-                        self.game.particle_system.create_effect(
-                            item.center_x, item.center_y,
-                            color=arcade.color.GOLD
-                        )
+        # 检查所有掉落物
+        for item in self.game.level_manager.current_level.items[:]:  # 使用副本遍历
+            if isinstance(item, DroppedItem) and arcade.check_for_collision(self.game.player, item):
+                # 直接放入当前选中格子（替换原有物品）
+                self.game.player.inventory[self.game.player.selected_slot] = item.item_data
+                item.remove_from_sprite_lists()
+
+                # 添加拾取特效
+                self.game.combat_system.particle_system.create_hit_effect(
+                    item.center_x, item.center_y
+                )
+                break  # 一次只拾取一个物品
 
     def handle_interaction(self, key):
         """处理交互按键"""

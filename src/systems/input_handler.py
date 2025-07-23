@@ -32,6 +32,30 @@ class InputHandler:
             self.game.level_manager.goto_level(1, player=self.game.player)
         elif key == arcade.key.F3:
             self.game.debug_mode = not self.game.debug_mode
+        elif key == arcade.key.KEY_1:  # 数字键快速选择格子
+            self.game.player.selected_slot = 0
+        elif key == arcade.key.KEY_2:
+            self.game.player.selected_slot = 1
+        elif key == arcade.key.KEY_3:
+            self.game.player.selected_slot = 2
+        elif key == arcade.key.KEY_4:
+            self.game.player.selected_slot = 3
+        elif key == arcade.key.KEY_5:
+            self.game.player.selected_slot = 4
+        elif key == arcade.key.KEY_6:
+            self.game.player.selected_slot = 5
+        elif key == arcade.key.KEY_7:
+            self.game.player.selected_slot = 6
+        elif key == arcade.key.KEY_8:
+            self.game.player.selected_slot = 7
+        elif key == arcade.key.KEY_9:
+            self.game.player.selected_slot = 8
+        elif key == arcade.key.E:  # 使用当前选中物品
+            selected_item = self.game.player.inventory[self.game.player.selected_slot]
+            if selected_item and hasattr(selected_item, 'use'):
+                selected_item.use(self.game.player)
+        elif key == arcade.key.F:  # 使用F键拾取物品
+            self.game.interaction_system.check_item_pickup()
 
         # 处理交互
         self.game.interaction_system.handle_interaction(key)

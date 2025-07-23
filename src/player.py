@@ -11,6 +11,8 @@ class Player(arcade.Sprite):
         super().__init__()
         self.logger = logger.getChild('Player')
         self.particle_system = ParticleSystem()
+        self.inventory = [None] * INVENTORY_SLOT_COUNT  # 物品栏数组
+        self.selected_slot = 0  # 当前选中的格子索引
 
 
         # 加载纹理

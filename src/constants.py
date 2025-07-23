@@ -1,5 +1,6 @@
 # constants.py
 import os
+import arcade
 from pathlib import Path
 
 # 屏幕设置
@@ -31,6 +32,14 @@ ENEMY_SCALE = 0.5      # 敌人基础缩放
 
 # 地面设置
 GROUND_Y = 130  # 地面线位置（从屏幕底部算起）
+
+#物品栏设置
+INVENTORY_SLOT_COUNT = 9  # 物品栏格子数量
+INVENTORY_SLOT_SIZE = 64  # 每个格子大小(像素)
+INVENTORY_SLOT_MARGIN = 2  # 格子间距
+INVENTORY_SLOT_COLOR = arcade.color.LIGHT_GRAY  # 格子默认颜色
+INVENTORY_SLOT_SELECTED_COLOR = arcade.color.GOLD  # 选中格子颜色
+INVENTORY_BACKGROUND_COLOR = arcade.color.DARK_GRAY  # 物品栏背景色
 
 # 路径处理
 PROJECT_ROOT = Path(__file__).parent.parent
