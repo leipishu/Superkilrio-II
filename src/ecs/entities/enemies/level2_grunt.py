@@ -213,31 +213,30 @@ class Level2Grunt(arcade.Sprite):
 
     def destroy(self):
         try:
-            print("=== 掉落物生成调试 ===")
             from src.items.weapons.iron_hook import IronHook
             from src.items.dropped_item import DroppedItem
 
             # 测试物品创建
-            print("创建IronHook实例...")
+            self.logger.info("创建IronHook实例...")
             hook = IronHook()
-            print(f"hook.texture exists: {hasattr(hook, 'texture')}")
-            print(f"hook.texture is None: {hook.texture is None}")
+            self.logger.info(f"hook.texture exists: {hasattr(hook, 'texture')}")
+            self.logger.info(f"hook.texture is None: {hook.texture is None}")
 
             if not hasattr(hook, 'texture') or hook.texture is None:
                 raise ValueError("IronHook贴图加载失败")
 
             # 测试掉落物创建
-            print("创建DroppedItem实例...")
+            self.logger.info("创建DroppedItem实例...")
             dropped_item = DroppedItem(
                 item=hook,
                 x=self.center_x,
                 y=self.center_y
             )
-            print(f"掉落物位置: ({dropped_item.center_x}, {dropped_item.center_y})")
-            print(f"掉落物贴图: {dropped_item.texture}")
+            self.logger.info(f"掉落物位置: ({dropped_item.center_x}, {dropped_item.center_y})")
+            self.logger.info(f"掉落物贴图: {dropped_item.texture}")
 
             return dropped_item
 
         except Exception as e:
-            print(f"掉落物生成失败: {e}")
+            self.logger.error(f"掉落物生成失败: {e}")
             return None

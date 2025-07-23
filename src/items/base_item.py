@@ -18,9 +18,12 @@ class BaseItem:
     def load_from_json(self, json_file: str) -> bool:
         """从JSON文件加载物品配置"""
         try:
+            logger.debug(f"开始加载物品JSON配置: {json_file}")
+
             if json_file not in self._json_cache:
                 with open(json_file, 'r', encoding='utf-8') as f:
                     self._json_cache[json_file] = json.load(f)
+                logger.debug(f"JSON配置缓存未命中，从文件加载: {json_file}")
 
             config = self._json_cache[json_file]
             self.item_id = config.get("item_id", "")
@@ -34,11 +37,16 @@ class BaseItem:
             # 关键修改：贴图路径使用assets目录
             texture_path = config.get("texture", "")
             if texture_path:
-                # 使用get_asset_path加载assets目录下的贴图
-                self.texture = arcade.load_texture(get_asset_path(texture_path))
-                print(f"贴图加载成功: {get_asset_path(texture_path)}")
+                full_texture_path = get_asset_path(texture_path)
+                logger.debug(f"尝试加载贴图: {full_texture_path}")
+                self.texture = arcade.load_texture(full_texture_path)
+                logger.info(f"贴图加载成功: {full_texture_path}")
+                logger.debug(f"贴图尺寸: {self.texture.width}x{self.texture.height}")
+            else:
+                logger.warning("配置中未指定贴图路径")
 
+            logger.debug("物品配置加载完成")
             return True
         except Exception as e:
-            logger.error(f"加载物品配置失败: {str(e)}")
+            logger.error(f"加载物品配置失败: {str(e)}", exc_info=True)
             return False
