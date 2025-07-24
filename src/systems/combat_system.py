@@ -68,30 +68,30 @@ class CombatSystem:
         self.particle_system.create_hit_effect(enemy.center_x, enemy.center_y, is_kill=True)
 
         # 2. 检查敌人是否有destroy方法
-        logger.info(f"开始销毁敌人: {enemy}")
+        self.logger.info(f"Start destroying enemy: {enemy}")
         if hasattr(enemy, 'destroy') and callable(enemy.destroy):
-            logger.info("敌人有destroy方法")
+            self.logger.info("No destroy method found")
             dropped_item = enemy.destroy()
             if dropped_item:
-                logger.info(f"成功创建掉落物: {dropped_item}")
+                self.logger.info(f"Successfully destroyed enemy, dropped item: {dropped_item}")
                 # 确保关卡有items列表
                 if not hasattr(self.game.level_manager.current_level, 'items'):
-                    logger.info("创建新的items列表")
+                    self.logger.info("Creating new item list")
                     self.game.level_manager.current_level.items = arcade.SpriteList()
                 # 添加掉落物
                 self.game.level_manager.current_level.items.append(dropped_item)
-                logger.info(f"掉落物已添加到场景, 当前items数量: {len(self.game.level_manager.current_level.items)}")
-                logger.info(f"掉落物位置: ({dropped_item.center_x}, {dropped_item.center_y})")
-                logger.info(f"掉落物纹理: {dropped_item.texture}")
+                self.logger.info(f"DroppedItem added to the scene, count: {len(self.game.level_manager.current_level.items)}")
+                self.logger.info(f"DroppedItem position: ({dropped_item.center_x}, {dropped_item.center_y})")
+                self.logger.info(f"DroppedItem texture: {dropped_item.texture}")
                 # audio_manager.play_sound("item_drop")
             else:
-                logger.warning("敌人destroy方法返回None")
+                self.logger.warning("Enemy destroy method returned None")
         else:
-            logger.warning(f"敌人没有destroy方法: {type(enemy)}")
+            self.logger.warning(f"No destroy method found for enemy: {type(enemy)}")
 
         # 3. 销毁敌人
         enemy.kill()
-        logger.info("敌人销毁完成")
+        self.logger.info("Successfully destroyed enemy")
 
     def get_entity_name(self, entity):
         """智能获取实体名称"""
@@ -106,7 +106,6 @@ class CombatSystem:
         name_map = {
             'Level1Grunt': '一级步兵',
             'Level2Grunt': '二级步兵',
-            'BossEnemy': '首领',
             'TrainerNPC': '教官',
         }
 

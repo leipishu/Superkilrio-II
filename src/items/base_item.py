@@ -12,18 +12,19 @@ class BaseItem:
     _json_cache = {}
 
     def __init__(self, json_file: str = None):
+        self.logger = logger.getChild(self.__class__.__name__)
         if json_file:
             self.load_from_json(json_file)
 
     def load_from_json(self, json_file: str) -> bool:
         """从JSON文件加载物品配置"""
         try:
-            logger.debug(f"开始加载物品JSON配置: {json_file}")
+            self.logger.debug(f"Start loading item config from file: {json_file}")
 
             if json_file not in self._json_cache:
                 with open(json_file, 'r', encoding='utf-8') as f:
                     self._json_cache[json_file] = json.load(f)
-                logger.debug(f"JSON配置缓存未命中，从文件加载: {json_file}")
+                self.logger.debug(f"JSON configuration cache missed. Load from file: {json_file}")
 
             config = self._json_cache[json_file]
             self.item_id = config.get("item_id", "")
@@ -38,15 +39,15 @@ class BaseItem:
             texture_path = config.get("texture", "")
             if texture_path:
                 full_texture_path = get_asset_path(texture_path)
-                logger.debug(f"尝试加载贴图: {full_texture_path}")
+                self.logger.debug(f"Attempting to load texture from: {full_texture_path}")
                 self.texture = arcade.load_texture(full_texture_path)
-                logger.info(f"贴图加载成功: {full_texture_path}")
-                logger.debug(f"贴图尺寸: {self.texture.width}x{self.texture.height}")
+                self.logger.info(f"Successfully loaded texture from: {full_texture_path}")
+                self.logger.debug(f"Texture size: {self.texture.width}x{self.texture.height}")
             else:
-                logger.warning("配置中未指定贴图路径")
+                self.logger.warning("Texture path not specified in JSON configuration.")
 
-            logger.debug("物品配置加载完成")
+            self.logger.debug("Item configuration loaded successfully")
             return True
         except Exception as e:
-            logger.error(f"加载物品配置失败: {str(e)}", exc_info=True)
+            logger.error(f"Failed to load item configuration from file: {json_file}. Error: {str(e)}", exc_info=True)
             return False

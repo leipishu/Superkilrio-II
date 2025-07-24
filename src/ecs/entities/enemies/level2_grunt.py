@@ -217,26 +217,26 @@ class Level2Grunt(arcade.Sprite):
             from src.items.dropped_item import DroppedItem
 
             # 测试物品创建
-            self.logger.info("创建IronHook实例...")
+            self.logger.info("Creating IronHook instance...")
             hook = IronHook()
             self.logger.info(f"hook.texture exists: {hasattr(hook, 'texture')}")
             self.logger.info(f"hook.texture is None: {hook.texture is None}")
 
             if not hasattr(hook, 'texture') or hook.texture is None:
-                raise ValueError("IronHook贴图加载失败")
+                raise ValueError("Failed to create IronHook texture")
 
             # 测试掉落物创建
-            self.logger.info("创建DroppedItem实例...")
+            self.logger.info("Creating DroppedItem instance...")
             dropped_item = DroppedItem(
                 item=hook,
                 x=self.center_x,
                 y=self.center_y
             )
-            self.logger.info(f"掉落物位置: ({dropped_item.center_x}, {dropped_item.center_y})")
-            self.logger.info(f"掉落物贴图: {dropped_item.texture}")
+            self.logger.info(f"DroppedItem created at ({dropped_item.center_x}, {dropped_item.center_y})")
+            self.logger.info(f"DroppedItem texture: {dropped_item.texture}")
 
             return dropped_item
 
         except Exception as e:
-            self.logger.error(f"掉落物生成失败: {e}")
+            self.logger.error(f"Failed to create dropped item: {e}")
             return None

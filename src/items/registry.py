@@ -15,6 +15,7 @@ class ItemRegistry:
         return cls._instance
 
     def __init__(self):
+        self.logger = logger.getChild('ItemRegistry')
         if self._initialized:
             return
         self._item_classes: Dict[str, type[BaseItem]] = {}
@@ -24,23 +25,23 @@ class ItemRegistry:
     def register_item_type(self, item_id: str, item_class: type[BaseItem]):
         """注册物品类型"""
         if not issubclass(item_class, BaseItem):
-            raise ValueError("物品类必须继承自BaseItem")
+            raise ValueError("The item class must be subclass of BaseItem.")
         self._item_classes[item_id] = item_class
-        logger.info(f"注册物品类型: {item_id}")
+        self.logger.info(f"Registered {item_id}")
 
     def create_item(self, item_id: str) -> Optional[BaseItem]:
         """创建物品实例"""
         if item_id not in self._item_classes:
-            logger.error(f"未知物品ID: {item_id}")
+            self.logger.error(f"Unknown item id: {item_id}")
             return None
 
         try:
             item = self._item_classes[item_id]()
             if not hasattr(item, 'texture') or item.texture is None:
-                logger.warning(f"物品 {item_id} 缺少有效贴图")
+                self.logger.warning(f"Item {item_id} has no texture")
             return item
         except Exception as e:
-            logger.error(f"创建物品失败: {item_id} - {str(e)}")
+            self.logger.error(f"Failed to create {item_id} - {str(e)}")
             return None
 
 
