@@ -2,7 +2,7 @@
   "item_id": "iron_hook",
   "name": "生锈铁钩",
   "description": "重型近战武器",
-  "damage": 35,
+  "damage": 100,
   "attack_range": 90,
   "attack_speed": 1.2,
   "scale": 0.3,

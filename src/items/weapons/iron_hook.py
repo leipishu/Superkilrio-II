@@ -27,11 +27,21 @@ class IronHook(BaseItem):
         logger.debug("=== IronHook Initialized ===")
 
     def use(self, player):
-        """装备武器"""
-        logger.debug(f"Attempting to equip weapon {self.name}")
+        """装备/取消装备武器"""
+        logger.debug(f"Attempting to toggle weapon {self.name}")
+
+        # 如果已经装备了这个武器，则取消装备
+        if hasattr(player,
+                   'equipped_weapon') and player.equipped_weapon and player.equipped_weapon.item_id == self.item_id:
+            player.unequip_weapon()
+            logger.info(f"Weapon {self.name} Unequipped")
+            return True
+
+        # 否则装备武器
         if hasattr(player, 'equip_weapon'):
             player.equip_weapon(self)
             logger.info(f"Weapon {self.name} Equipped")
             return True
+
         logger.warning("The player does not have equip_weapon method")
         return False

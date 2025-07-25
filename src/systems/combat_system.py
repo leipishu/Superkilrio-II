@@ -49,12 +49,14 @@ class CombatSystem:
                 hitbox['top'] > enemy.bottom)
 
     def apply_damage(self, enemy, damage, hit_x, hit_y):
-        """对敌人造成伤害并添加粒子效果"""
+        """对敌人造成伤害，使用武器伤害值"""
+        damage = self.game.player.equipped_weapon.damage if self.game.player.equipped_weapon else ATTACK_DAMAGE
+
         if hasattr(enemy, 'health'):
             enemy.health -= damage
-            self.logger.debug(f"Enemy took {damage} damage, remaining health: {enemy.health}")
+            self.logger.debug(
+                f"Enemy took {damage} damage from {'weapon' if self.game.player.equipped_weapon else 'default attack'}")
 
-            # 创建击中粒子效果
             self.particle_system.create_hit_effect(hit_x, hit_y)
 
             if enemy.health <= 0:

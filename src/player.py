@@ -13,7 +13,8 @@ class Player(arcade.Sprite):
         self.particle_system = ParticleSystem()
         self.inventory = [None] * INVENTORY_SLOT_COUNT  # 物品栏数组
         self.selected_slot = 0  # 当前选中的格子索引
-
+        self.equipped_weapon = None  # 当前装备的武器
+        self.weapon_attack_textures = {}  # 武器攻击动画缓存
 
         # 加载纹理
         assets_dir = get_asset_path("player")
@@ -61,30 +62,31 @@ class Player(arcade.Sprite):
         self.is_dead = False
 
     def update_animation(self, delta_time):
-        """更新动画状态"""
-        # 跳跃状态检测
-        self.is_on_ground = (self.bottom <= GROUND_Y and self.change_y == 0)
-        if self.is_on_ground:
-            self.remaining_jumps = 1
-
-        # 攻击动画优先
+        """更新动画状态，支持武器动画"""
         if self.is_attacking:
             self.attack_timer += delta_time
             frame_duration = ATTACK_ANIMATION_SPEED
 
-            # 两帧攻击动画
+            if self.equipped_weapon:
+                frame_duration /= self.equipped_weapon.attack_speed
+
             if self.attack_timer < frame_duration:
                 self.attack_frame = 0
             elif self.attack_timer < frame_duration * 2:
                 self.attack_frame = 1
             else:
-                # 攻击结束
                 self.is_attacking = False
                 self.attack_timer = 0
                 self.attack_frame = 0
-                self.has_dealt_damage = False  # 重置伤害标记
+                self.has_dealt_damage = False
 
-            self.texture = self.attack_textures[self.attack_frame]
+            # 使用武器动画或默认动画
+            textures = self.weapon_attack_textures.get(
+                self.equipped_weapon.item_id if self.equipped_weapon else None,
+                self.attack_textures
+            )
+            self.texture = textures[self.attack_frame]
+
             if not self.facing_right:
                 flipped = self.texture.image.transpose(FLIP_LEFT_RIGHT)
                 self.texture = arcade.Texture(f"{self.texture.name}_flipped", flipped)
@@ -108,13 +110,17 @@ class Player(arcade.Sprite):
                     self.texture = texture
 
     def try_attack(self):
-        """尝试进行攻击"""
+        """尝试进行攻击，使用武器属性"""
         current_time = time.time()
-        if current_time - self.last_attack_time >= ATTACK_COOLDOWN:
+        cooldown = ATTACK_COOLDOWN
+        if self.equipped_weapon:
+            cooldown /= self.equipped_weapon.attack_speed
+
+        if current_time - self.last_attack_time >= cooldown:
             self.is_attacking = True
             self.attack_timer = 0
             self.last_attack_time = current_time
-            self.has_dealt_damage = False  # 重置伤害标记
+            self.has_dealt_damage = False
             return True
         return False
 
@@ -130,19 +136,48 @@ class Player(arcade.Sprite):
             self.logger.info('Player died!')
 
     def get_attack_hitbox(self):
-        """获取攻击判定框"""
+        """获取攻击判定框，使用武器范围"""
         if not self.is_attacking:
             return None
 
-        # 根据面向方向调整攻击范围
-        direction = 1 if self.facing_right else -1
-        hitbox_x = self.center_x + (direction * ATTACK_RANGE / 2)
-        hitbox_y = self.center_y
+        attack_range = ATTACK_RANGE
+        if self.equipped_weapon:
+            attack_range = self.equipped_weapon.attack_range
 
-        # 攻击判定框
+        direction = 1 if self.facing_right else -1
+        hitbox_x = self.center_x + (direction * attack_range / 2)
+
         return {
-            'left': hitbox_x - ATTACK_RANGE / 2,
-            'right': hitbox_x + ATTACK_RANGE / 2,
-            'bottom': hitbox_y - 40,
-            'top': hitbox_y + 40
+            'left': hitbox_x - attack_range / 2,
+            'right': hitbox_x + attack_range / 2,
+            'bottom': self.center_y - 40,
+            'top': self.center_y + 40
         }
+
+    def equip_weapon(self, weapon):
+        """装备武器"""
+        self.equipped_weapon = weapon
+        self.logger.info(f"Equipped weapon: {weapon.name}")
+
+        # 预加载武器攻击动画
+        if weapon.item_id not in self.weapon_attack_textures:
+            try:
+                assets_dir = get_asset_path(f"player/{weapon.item_id}")
+                self.weapon_attack_textures[weapon.item_id] = [
+                    arcade.load_texture(f"{assets_dir}/attack_1.png"),
+                    arcade.load_texture(f"{assets_dir}/attack_2.png")
+                ]
+                self.logger.debug(f"Loaded weapon textures for {weapon.item_id}")
+            except Exception as e:
+                self.logger.warning(f"Failed to load weapon textures: {str(e)}")
+                # 使用默认攻击动画作为后备
+                self.weapon_attack_textures[weapon.item_id] = self.attack_textures
+
+    def unequip_weapon(self):
+        """取消装备当前武器"""
+        if self.equipped_weapon:
+            weapon_name = self.equipped_weapon.name
+            self.equipped_weapon = None
+            self.logger.info(f"Unequipped weapon: {weapon_name}")
+            return True
+        return False
