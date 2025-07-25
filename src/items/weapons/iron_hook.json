@@ -4,7 +4,7 @@
   "description": "重型近战武器",
   "damage": 100,
   "attack_range": 90,
-  "attack_speed": 1.2,
+  "attack_speed": 0.8,
   "scale": 0.3,
   "texture": "items/weapons/iron_hook.png"
 }
