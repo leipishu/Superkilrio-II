@@ -50,12 +50,19 @@ class InputHandler:
             self.game.player.selected_slot = 7
         elif key == arcade.key.KEY_9:
             self.game.player.selected_slot = 8
-        elif key == arcade.key.E:  # 使用当前选中物品
+        elif key == arcade.key.F:  # 使用当前选中物品
             selected_item = self.game.player.inventory[self.game.player.selected_slot]
             if selected_item and hasattr(selected_item, 'use'):
                 selected_item.use(self.game.player)
-        elif key == arcade.key.F:  # 使用F键拾取物品
+        elif key == arcade.key.E:  # 使用F键拾取物品
             self.game.interaction_system.check_item_pickup()
+        elif key == arcade.key.Q:  # 丢弃当前选中物品
+            dropped_item = self.game.player.drop_item(self.game.player.selected_slot)
+            if dropped_item:
+                # 确保当前关卡有物品列表
+                if not hasattr(self.game.level_manager.current_level, 'items'):
+                    self.game.level_manager.current_level.items = arcade.SpriteList()
+                self.game.level_manager.current_level.items.append(dropped_item)
 
         # 处理交互
         self.game.interaction_system.handle_interaction(key)

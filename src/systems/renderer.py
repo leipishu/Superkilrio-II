@@ -246,7 +246,7 @@ class Renderer:
             if isinstance(item, DroppedItem) and arcade.check_for_collision(self.game.player, item):
                 # 在玩家头顶显示提示
                 arcade.draw_text(
-                    "按F拾取",
+                    "按E拾取",
                     self.game.player.center_x,
                     self.game.player.top + 20,
                     arcade.color.WHITE,

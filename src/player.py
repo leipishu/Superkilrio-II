@@ -3,6 +3,7 @@ from constants import *
 from PIL.Image import FLIP_LEFT_RIGHT
 from utils.logging_config import logger
 from src.systems.particle_system import ParticleSystem
+from src.items.dropped_item import DroppedItem
 import time
 
 
@@ -181,3 +182,24 @@ class Player(arcade.Sprite):
             self.logger.info(f"Unequipped weapon: {weapon_name}")
             return True
         return False
+
+    def drop_item(self, slot):
+        if not 0 <= slot < len(self.inventory) or not self.inventory[slot]:
+            return None
+
+        # 如果丢弃的是已装备的武器，先解除装备
+        if self.equipped_weapon and self.inventory[slot] == self.equipped_weapon:
+            self.unequip_weapon()
+
+        # 创建掉落物
+        item = self.inventory[slot]
+        dropped_item = DroppedItem(
+            item=item,
+            x=self.center_x,
+            y=self.center_y + 50  # 从玩家头顶上方掉落
+        )
+
+        # 从物品栏移除
+        self.inventory[slot] = None
+
+        return dropped_item
