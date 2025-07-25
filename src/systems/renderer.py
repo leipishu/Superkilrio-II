@@ -86,44 +86,107 @@ class Renderer:
         arcade.draw_text(f"HP: {player.health}/{player.max_health}", x + 10, y + 2, arcade.color.WHITE, 18, font_name=self.game.font_name)
 
     def _draw_inventory(self):
-        """绘制物品栏"""
+        """绘制物品栏界面，包含独立的装备栏和物品栏，整体居中"""
         player = self.game.player
 
-        # 计算物品栏总宽度和起始位置(居中)
-        total_width = (INVENTORY_SLOT_SIZE * INVENTORY_SLOT_COUNT +
-                       INVENTORY_SLOT_MARGIN * (INVENTORY_SLOT_COUNT - 1))
-        start_x = (SCREEN_WIDTH - total_width) // 2
-        y = SCREEN_HEIGHT - INVENTORY_SLOT_SIZE - 20  # 顶部留20像素边距
+        # ============= 计算布局参数 =============
+        # 装备栏宽度（1个格子）
+        equip_width = INVENTORY_SLOT_SIZE
 
-        # 绘制背景条
+        # 物品栏宽度（含所有格子和间距）
+        inventory_width = (INVENTORY_SLOT_SIZE * INVENTORY_SLOT_COUNT +
+                           INVENTORY_SLOT_MARGIN * (INVENTORY_SLOT_COUNT - 1))
+
+        # 两部分间距
+        gap = 40  # 像素
+
+        # 整体宽度
+        total_width = equip_width + gap + inventory_width
+
+        # 起始X坐标（整体居中）
+        start_x = (SCREEN_WIDTH - total_width) // 2
+        y = SCREEN_HEIGHT - INVENTORY_SLOT_SIZE - 20  # 顶部间距20像素
+
+        # ============= 绘制装备栏 =============
+        equip_x = start_x
+
+        # 装备栏背景框
         arcade.draw_rectangle_filled(
-            SCREEN_WIDTH // 2, y + INVENTORY_SLOT_SIZE // 2,
-            total_width + 20, INVENTORY_SLOT_SIZE + 20,
-            INVENTORY_BACKGROUND_COLOR
+            equip_x + INVENTORY_SLOT_SIZE // 2,
+            y + INVENTORY_SLOT_SIZE // 2,
+            INVENTORY_SLOT_SIZE + 20,  # 宽度+20（两侧各10）
+            INVENTORY_SLOT_SIZE + 20,  # 高度+20
+            INVENTORY_BACKGROUND_COLOR  # 灰色外框
         )
 
-        # 绘制所有格子
-        for i in range(INVENTORY_SLOT_COUNT):
-            x = start_x + i * (INVENTORY_SLOT_SIZE + INVENTORY_SLOT_MARGIN)
+        # 装备格子
+        arcade.draw_rectangle_filled(
+            equip_x + INVENTORY_SLOT_SIZE // 2,
+            y + INVENTORY_SLOT_SIZE // 2,
+            INVENTORY_SLOT_SIZE,
+            INVENTORY_SLOT_SIZE,
+            INVENTORY_SLOT_COLOR
+        )
 
-            # 绘制格子背景
+        # 装备格子边框
+        arcade.draw_rectangle_outline(
+            equip_x + INVENTORY_SLOT_SIZE // 2,
+            y + INVENTORY_SLOT_SIZE // 2,
+            INVENTORY_SLOT_SIZE,
+            INVENTORY_SLOT_SIZE,
+            arcade.color.BLACK,
+            2
+        )
+
+        # 绘制装备的武器
+        if player.equipped_weapon:
+            weapon_sprite = arcade.Sprite()
+            weapon_sprite.texture = player.equipped_weapon.texture
+            weapon_sprite.scale = min(
+                INVENTORY_SLOT_SIZE / weapon_sprite.texture.width * 0.8,
+                INVENTORY_SLOT_SIZE / weapon_sprite.texture.height * 0.8
+            )
+            weapon_sprite.center_x = equip_x + INVENTORY_SLOT_SIZE // 2
+            weapon_sprite.center_y = y + INVENTORY_SLOT_SIZE // 2
+            weapon_sprite.draw()
+
+        # ============= 绘制物品栏 =============
+        inventory_x = start_x + equip_width + gap
+
+        # 物品栏背景框
+        arcade.draw_rectangle_filled(
+            inventory_x + inventory_width // 2,
+            y + INVENTORY_SLOT_SIZE // 2,
+            inventory_width + 20,  # 宽度+20
+            INVENTORY_SLOT_SIZE + 20,  # 高度+20
+            INVENTORY_BACKGROUND_COLOR  # 灰色外框
+        )
+
+        # 绘制所有物品格子
+        for i in range(INVENTORY_SLOT_COUNT):
+            x = inventory_x + i * (INVENTORY_SLOT_SIZE + INVENTORY_SLOT_MARGIN)
+
+            # 格子背景
             color = INVENTORY_SLOT_SELECTED_COLOR if i == player.selected_slot else INVENTORY_SLOT_COLOR
             arcade.draw_rectangle_filled(
                 x + INVENTORY_SLOT_SIZE // 2,
                 y + INVENTORY_SLOT_SIZE // 2,
-                INVENTORY_SLOT_SIZE, INVENTORY_SLOT_SIZE,
+                INVENTORY_SLOT_SIZE,
+                INVENTORY_SLOT_SIZE,
                 color
             )
 
-            # 绘制格子边框
+            # 格子边框
             arcade.draw_rectangle_outline(
                 x + INVENTORY_SLOT_SIZE // 2,
                 y + INVENTORY_SLOT_SIZE // 2,
-                INVENTORY_SLOT_SIZE, INVENTORY_SLOT_SIZE,
-                arcade.color.BLACK, 2
+                INVENTORY_SLOT_SIZE,
+                INVENTORY_SLOT_SIZE,
+                arcade.color.BLACK,
+                2
             )
 
-            # 绘制物品(如果有)
+            # 绘制物品
             if player.inventory[i]:
                 item = player.inventory[i]
                 item_sprite = arcade.Sprite()
