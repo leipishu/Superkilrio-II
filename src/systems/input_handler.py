@@ -25,7 +25,7 @@ class InputHandler:
         elif key == arcade.key.Z:  # 新增攻击键
             self.game.player.try_attack()
         elif key == arcade.key.SPACE:
-            if self.game.level_manager.current_level.is_completed:
+            if self.game.level_manager.current_level.is_completed and not self.game.dialogue_system.is_visible:
                 self.game.level_manager.next_level(player=self.game.player)
         elif key == arcade.key.F1:
             # 手动切换到关卡1进行测试
