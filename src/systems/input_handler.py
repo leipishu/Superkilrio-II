@@ -29,7 +29,7 @@ class InputHandler:
                 self.game.level_manager.next_level(player=self.game.player)
         elif key == arcade.key.F1:
             # 手动切换到关卡1进行测试
-            self.game.level_manager.goto_level(1, player=self.game.player)
+            self.game.level_manager.goto_level(3, player=self.game.player)
         elif key == arcade.key.F3:
             self.game.debug_mode = not self.game.debug_mode
         elif key == arcade.key.KEY_1:  # 数字键快速选择格子

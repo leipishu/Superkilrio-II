@@ -71,26 +71,32 @@ class Player(arcade.Sprite):
             if self.equipped_weapon:
                 frame_duration /= self.equipped_weapon.attack_speed
 
-            if self.attack_timer < frame_duration:
-                self.attack_frame = 0
-            elif self.attack_timer < frame_duration * 2:
-                self.attack_frame = 1
+            # 获取当前武器的动画纹理，如果没有则使用默认
+            textures = self.weapon_attack_textures.get(
+                self.equipped_weapon.item_id if self.equipped_weapon else None,
+                self.attack_textures
+            )
+
+            # 计算当前应该显示的帧
+            total_frames = len(textures)
+            frame_time = frame_duration * total_frames
+            if self.attack_timer < frame_time:
+                # 根据攻击时间计算当前帧
+                self.attack_frame = int(self.attack_timer / frame_duration)
+                if self.attack_frame >= total_frames:
+                    self.attack_frame = total_frames - 1
+
+                self.texture = textures[self.attack_frame]
+
+                if not self.facing_right:
+                    flipped = self.texture.image.transpose(FLIP_LEFT_RIGHT)
+                    self.texture = arcade.Texture(f"{self.texture.name}_flipped", flipped)
             else:
                 self.is_attacking = False
                 self.attack_timer = 0
                 self.attack_frame = 0
                 self.has_dealt_damage = False
 
-            # 使用武器动画或默认动画
-            textures = self.weapon_attack_textures.get(
-                self.equipped_weapon.item_id if self.equipped_weapon else None,
-                self.attack_textures
-            )
-            self.texture = textures[self.attack_frame]
-
-            if not self.facing_right:
-                flipped = self.texture.image.transpose(FLIP_LEFT_RIGHT)
-                self.texture = arcade.Texture(f"{self.texture.name}_flipped", flipped)
             return
 
         # 原有动画逻辑
@@ -164,11 +170,20 @@ class Player(arcade.Sprite):
         if weapon.item_id not in self.weapon_attack_textures:
             try:
                 assets_dir = get_asset_path(f"player/{weapon.item_id}")
-                self.weapon_attack_textures[weapon.item_id] = [
-                    arcade.load_texture(f"{assets_dir}/attack_1.png"),
-                    arcade.load_texture(f"{assets_dir}/attack_2.png")
-                ]
-                self.logger.debug(f"Loaded weapon textures for {weapon.item_id}")
+                textures = []
+                frame = 1
+                while True:
+                    try:
+                        texture = arcade.load_texture(f"{assets_dir}/attack_{frame}.png")
+                        textures.append(texture)
+                        frame += 1
+                    except:
+                        if frame == 1:  # 如果没有找到任何帧，使用默认动画
+                            raise ValueError("No attack frames found")
+                        break
+
+                self.weapon_attack_textures[weapon.item_id] = textures
+                self.logger.debug(f"Loaded {len(textures)} weapon textures for {weapon.item_id}")
             except Exception as e:
                 self.logger.warning(f"Failed to load weapon textures: {str(e)}")
                 # 使用默认攻击动画作为后备

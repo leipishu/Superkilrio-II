@@ -1,0 +1,10 @@
+{
+  "item_id": "firelock",
+  "name": "火枪",
+  "description": "喷火枪，对多个敌人同时造成火焰伤害",
+  "damage": 150,
+  "attack_range": 150,
+  "attack_speed": 0.8,
+  "scale": 0.3,
+  "texture": "items/weapons/firelock.png"
+}

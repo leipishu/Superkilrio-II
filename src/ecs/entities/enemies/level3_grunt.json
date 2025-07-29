@@ -1,0 +1,11 @@
+{
+  "health": 150,
+  "speed": 2.0,
+  "ai_type": "chase",
+  "detection_range": 450,
+  "jump_ratio": 0.7,
+  "animation_speed": 0.1,
+  "scale": 0.45,
+  "attack_cooldown": 1.0,
+  "attack_damage": 4
+} 
