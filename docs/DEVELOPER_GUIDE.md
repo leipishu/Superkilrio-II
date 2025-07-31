@@ -11,20 +11,102 @@ Superkilrio II/
 │
 ├─ docs/                # 多语言文档
 ├─ src/                 # 主代码目录
-│  ├─ assets/           # 游戏资源（图片、角色、敌人等）
-│  ├─ ecs/              # 实体组件系统（Entity-Component-System）
-│  │  ├─ entities/      # 敌人、NPC等实体定义
-│  │  ├─ systems/       # AI、对话等系统
+│  ├─ assets/           # 游戏资源
+│  │  ├─ effects/       # 特效
+│  │  │  ├─ hit.png
+│  │  │  └─ kill.png
+│  │  ├─ enemies/       # 敌人资源
+│  │  │  ├─ level1_grunt/
+│  │  │  │  ├─ attack_1.png
+│  │  │  │  └─ attack_2.png
+│  │  │  ├─ level2_grunt/
+│  │  │  │  ├─ attack_1.png
+│  │  │  │  └─ attack_2.png
+│  │  │  ├─ level3_grunt/
+│  │  │  │  ├─ attack_1.png
+│  │  │  │  ├─ attack_2.png
+│  │  │  │  └─ attack_3.png
+│  │  │  └─ public/      # 共享资源
+│  │  │     ├─ run_1.png
+│  │  │     ├─ run_2.png
+│  │  │     ├─ run_3.png
+│  │  │     ├─ run_4.png
+│  │  │     ├─ run_5.png
+│  │  │     ├─ run_6.png
+│  │  │     └─ stand.png
+│  │  ├─ items/         # 物品资源
+│  │  │  ├─ weapons/
+│  │  │  │  ├─ firelock.png
+│  │  │  │  └─ iron_hook.png
+│  │  │  └─ quest_items/ # 任务物品...
+│  │  ├─ npc/           # NPC资源
+│  │  │  └─ trainer.png
+│  │  └─ player/        # 玩家资源
+│  │     ├─ attack_1.png
+│  │     ├─ attack_2.png
+│  │     ├─ jump.png
+│  │     ├─ run_1.png
+│  │     ├─ run_2.png
+│  │     ├─ run_3.png
+│  │     ├─ run_4.png
+│  │     ├─ run_5.png
+│  │     ├─ run_6.png
+│  │     ├─ stand.png
+│  │     ├─ firelock/
+│  │     │  ├─ attack_1.png
+│  │     │  ├─ attack_2.png
+│  │     │  └─ attack_3.png
+│  │     └─ iron_hook/
+│  │        ├─ attack_1.png
+│  │        └─ attack_2.png
+│  ├─ ecs/              # ECS架构
+│  │  ├─ entities/      # 实体定义
+│  │  │  ├─ enemies/    # 敌人
+│  │  │  │  ├─ level1_grunt.json
+│  │  │  │  ├─ level1_grunt.py
+│  │  │  │  ├─ level2_grunt.json
+│  │  │  │  ├─ level2_grunt.py
+│  │  │  │  ├─ level3_grunt.json
+│  │  │  │  ├─ level3_grunt.py
+│  │  │  │  └─ ...      # 可添加更多敌人
+│  │  │  └─ npc/        # NPC
+│  │  │     ├─ trainer.py
+│  │  │     └─ ...      # 可添加更多NPC
+│  │  ├─ systems/       # 系统
+│  │  │  ├─ ai_system.py
+│  │  │  └─ dialogue_system.py
 │  │  └─ registry.py    # 实体注册表
-│  ├─ levels/           # 关卡管理与具体关卡
-│  │  ├─ level_manager.py
-│  │  └─ levels/        # 具体关卡实现（level_00.py, level_01.py等）
-│  ├─ systems/          # 游戏系统（输入、物理、渲染、交互）
-│  ├─ utils/            # 工具类（如日志配置）
+│  ├─ items/            # 物品系统
+│  │  ├─ weapons/       # 武器
+│  │  │  ├─ firelock.json
+│  │  │  ├─ firelock.py
+│  │  │  ├─ iron_hook.json
+│  │  │  ├─ iron_hook.py
+│  │  │  └─ ...         # 可添加更多武器
+│  │  ├─ quest_items/   # 任务物品...
+│  │  ├─ base_item.py   # 物品基类
+│  │  └─ registry.py    # 物品注册表
+│  ├─ levels/           # 关卡系统
+│  │  ├─ levels/        # 具体关卡
+│  │  │  ├─ level_00.py
+│  │  │  ├─ level_01.py
+│  │  │  ├─ level_02.py
+│  │  │  ├─ level_03.py
+│  │  │  └─ ...         # 可添加更多关卡
+│  │  └─ level_manager.py
+│  ├─ systems/          # 游戏系统
+│  │  ├─ audio_manager.py
+│  │  ├─ combat_system.py
+│  │  ├─ input_handler.py
+│  │  ├─ interaction_system.py
+│  │  ├─ particle_system.py
+│  │  ├─ physics_system.py
+│  │  └─ renderer.py
+│  ├─ utils/            # 工具类
 │  ├─ constants.py      # 全局常量
-│  ├─ game_controller.py# 游戏主控制器
+│  ├─ game_controller.py# 游戏控制器
 │  ├─ main.py           # 程序入口
-│  └─ player.py         # 玩家角色实现
+│  └─ player.py         # 玩家实现
 ├─ requirements.txt     # 依赖库
 └─ README.md            # 项目说明
 ```
@@ -34,10 +116,27 @@ Superkilrio II/
 ### 2. 关卡与实体注册机制
 
 #### 2.1 关卡注册与加载
-- 关卡基类：`src/levels/level_manager.py` 中的 `Level` 类。
-- 关卡注册：`LevelManager` 自动扫描 `src/levels/levels/` 下所有 `level_*.py` 文件并注册。
-- 关卡实现规范：每个关卡需定义 `LEVEL_NUM` 常量和 `Level` 类（继承自 `level_manager.Level`），实现 `setup(self, player=None)`、`update(self, delta_time)`、`draw(self)`。
+- 关卡基类：`src/levels/level_manager.py` 中的 `Level` 类
+  - 关键属性：
+    - `enemies`: 当前关卡敌人列表
+    - `npcs`: 当前关卡NPC列表
+    - `items`: 当前关卡物品列表
+  - 必须实现方法：
+    - `setup(self, player=None)`: 初始化关卡
+      - 参数: player - 玩家实例(可选)
+      - 返回: None
+    - `update(self, delta_time)`: 更新关卡逻辑
+      - 参数: delta_time - 帧间隔时间(秒)
+      - 返回: None
+    - `draw(self)`: 渲染关卡
+      - 返回: None
+- 关卡注册：`LevelManager` 自动扫描 `src/levels/levels/` 下所有 `level_*.py` 文件并注册
+- 关卡命名规范：`level_<编号>.py` (如level_00.py, level_01.py...)
 - 切换关卡：`level_manager.goto_level(level_num, player=player)`
+  - 参数: 
+    - level_num: 关卡编号(int)
+    - player: 玩家实例(可选)
+  - 返回: None
 
 #### 2.2 实体注册与生成
 - 注册表类：`src/ecs/registry.py` 中的 `EntityRegistry`
@@ -82,7 +181,33 @@ Superkilrio II/
 - 主要属性：`self.player`、`self.level_manager`、`self.dialogue_system`、`self.physics_system`、`self.interaction_system`、`self.input_handler`、`self.renderer`
 - 主要方法：`setup()`、`on_draw()`、`on_update(delta_time)`、`on_key_press(key, modifiers)`、`on_key_release(key, modifiers)`、`run()`
 
-#### 4.2 玩家与敌人
+#### 4.2 武器系统
+- 基类：`src/items/base_item.py` 中的 `BaseItem`
+  - 必须属性：`item_id`, `name`
+  - 可选属性：`damage`, `attack_range`, `attack_speed`, `scale`
+  - 方法：`load_from_json(json_file)` 从JSON加载配置
+- 武器实现：
+  - 继承 `BaseItem`
+  - 必须实现 `use(player)` 方法
+  - 示例：`src/items/weapons/iron_hook.py`, `src/items/weapons/firelock.py`
+- 玩家接口：
+  - `equip_weapon(weapon)`: 装备武器
+  - `unequip_weapon()`: 取消装备
+  - `equipped_weapon`: 当前装备的武器
+- JSON配置：
+  ```json
+  {
+    "item_id": "iron_hook",
+    "name": "铁钩",
+    "description": "一把锋利的铁钩",
+    "damage": 15,
+    "attack_range": 120,
+    "attack_speed": 1.2,
+    "texture": "items/weapons/iron_hook.png"
+  }
+  ```
+
+#### 4.3 玩家与敌人
 - 玩家类：`src/player.py`，继承自 `arcade.Sprite`
 - 敌人类：如 `src/ecs/entities/enemies/level1_grunt.py`
 - 动画与物理属性：均在各自类的 `__init__` 中初始化
@@ -111,11 +236,30 @@ Superkilrio II/
 
 ---
 
-### 6. 关卡开发流程示例
+### 6. 开发流程示例
+
+#### 6.1 关卡开发
 1. 在 `src/levels/levels/` 新建 `level_xx.py`，定义 `LEVEL_NUM` 和 `Level` 类。
 2. 在 `Level.setup(self, player=None)` 中生成敌人/NPC，添加到 `self.enemies` 或 `self.npcs`。
 3. 在 `update`/`draw` 方法中实现关卡逻辑与渲染。
 4. 关卡会被 `LevelManager` 自动注册和加载。
+
+#### 6.2 武器开发
+1. 在 `src/items/weapons/` 下新建武器文件（如 `new_weapon.py`）
+2. 创建继承 `BaseItem` 的类：
+   ```python
+   class NewWeapon(BaseItem):
+       def __init__(self):
+           json_path = os.path.join(os.path.dirname(__file__), "new_weapon.json")
+           super().__init__(json_path)
+       
+       def use(self, player):
+           # 装备/取消装备逻辑
+           pass
+   ```
+3. 创建对应的JSON配置文件（如 `new_weapon.json`）
+4. 添加武器纹理到 `src/assets/items/weapons/`
+5. 在关卡或NPC中生成武器实例
 
 ---
 
